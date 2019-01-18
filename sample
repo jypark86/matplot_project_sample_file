@@ -1,0 +1,81 @@
+<single board for booting>
+Installation Steps
+
+ Run PetaLinux Tools Installer
+  $ mkdir -p /opt/pkg/petalinux
+   $ ./petalinux-v2017.1-final-installer.run /opt/pkg/petalinux
+
+	PetaLinux Working Enviroment Setup
+	 
+	 setting script
+	  
+	 PetaLinux BSP Installation
+	  
+	  $ cd /home/...(you want)
+	   $petalinux-create -t project -s <path-to-bsp>
+		 
+		Create a New PetaLinux Project
+
+		 
+		 $ petalinux-create --type project --template <CPU_TYPE> --name <PROJECT_NAME>
+		  ex.)petalinux-create -t project -n petalinux_project -s path/xilinux-zc706-v2017.4-final1.bsp
+
+		  PetaLinux Configuration(without manual)
+	 
+	 $petalinux-config -c rootfs
+	  $petalinux-config -c kernel
+
+	  Import Hardware Configuration
+	   
+	   $petalinux-config --get-hw-description ~
+		 ex.)petalinux-config --get-hw-description path/hw_description/181026_add_emaclite
+
+		 Using External Kernel and U-boot With PetaLinux(page 73)
+	 
+	 download: Internet connection with git access is available
+	  
+	  Change into the root directory of your PetaLinux project
+	   $ cd <plnx-proj-root>
+		 $ petalinux-config
+
+		  
+		  Run petalinux-config, and go into "linux Components Selection --->" sub-menu,
+		   ° For kernel, select "linux-kernel () --->" and then select ext-local-src
+			   ( ) linux-xlnx
+				   (X) ext-local-src
+					   ( ) remote
+
+						 ° For U-boot, select " u-boot () --->” and then select ext-local-src
+						    ( ) u-boot-plnx
+							    ( ) remote
+								    (X) ext-local-src
+									  For kernel, select "External linux-kernel local source settings ---> "
+									   Enter the path: external kernel or boot path
+										 
+										Build System Image
+										 
+										 Change into the directory of your PetaLinux project.
+										  $ cd <plnx-proj-root>
+										   Run petalinux-build to build the system image:
+											 petalinux-build
+
+											 Boot(just follow) -> complete all H/W setting -> board on
+											  
+											  peta_script.tar.gz -> use script file
+											   $xsdb conn
+												 $xsdb jtag tar
+												  ex.) Digilent JTAG-SMT2 210251A1C034
+
+												   change set_cable* info
+													 ex.)
+													  $vi set_cable0
+													    set cable "Digilent JTAG-SMT2 210251A1C034"
+														   set cable_node "Digilent JTAG-SMT2 210251A1C034"
+															 
+															 boot on board
+															  $./peta_upload(bash script)
+
+	 check the booting state(using minicom)
+	 $ls /dev(USBport checking)
+	  $sudo vi /etc/minicom/minirc.dfl(change the port)
+	 $sudo minicom -c on
